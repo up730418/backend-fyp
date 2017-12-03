@@ -1,0 +1,7 @@
+.quote{
+    text-indent: 0.5vw;
+    padding: 0.4vh;
+    word-break: break-all;
+    white-space: pre-line;
+    margin-bottom: 1em;
+}
