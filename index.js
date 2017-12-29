@@ -19,8 +19,9 @@ app.use(allowCrossDomain);
 app.use('/api/poll', require('./api/poll'));
 app.use('/api/quote', require('./api/quote'));
 app.use('/api/chat', require('./api/chat'));
+app.use('/api/lesson', require('./api/lesson'));
 
-//app.use(express.static('poll', {extensions: ['html']}));
+//app.use('/', express.static('static'));
 //app.use(express.static('quote', {extensions: ['html']}));
 //app.use(express.static('chat', {extensions: ['html']}));
 //app.use(express.static('angular', {extensions: ['html']}));

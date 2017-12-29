@@ -5,16 +5,22 @@ const MongoClient = require('mongodb').MongoClient;
 const assert = require('assert');
 const express = require('express');
 
+const googleauth = require('simple-google-openid');
+
 const chat = express.Router();
 
 module.exports = chat;
 
 const db = require('./chat-MongoDB');
 
+chat.use(googleauth('637021493194-nncq03bpm7am8odjsl69ibceoutch5k4.apps.googleusercontent.com'));
+chat.use('*', googleauth.guardMiddleware({ realm: 'jwt' }));
+
 
 chat.get('/:id(\\w+)', async (req, res) => {
   const room = req.params.id
   try{
+    console.log(req.user)
     res.json(await db.get(room, 50));
   
   } catch(e) {

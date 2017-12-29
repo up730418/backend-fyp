@@ -6,34 +6,88 @@ const assert = require('assert');
 const express = require('express');
 const url = 'mongodb://localhost:27017/data';
 const poll = express.Router();
+const googleauth = require('simple-google-openid');
 
 module.exports = poll;
 
 const db = require('./poll-MongoDB');
 
+poll.use(googleauth('637021493194-nncq03bpm7am8odjsl69ibceoutch5k4.apps.googleusercontent.com'));
+poll.use('*', googleauth.guardMiddleware({ realm: 'jwt' }));
+
 /********** DB Functions ****************/
 poll.get('/:id(\\w+)', async (req, res) => {
   const id = parseInt(req.params.id)
-  console.log("here")
-  try{
-    res.json(await db.get(id));
-  
-  } catch(e) {
+  console.log(id)
+  if (id){
+    try{
+     const data = await db.get(id);
+
+     const user = data.access.find((user) => {
+       return user == req.user.emails[0].value;
+
+     });
+    const owner = data.owner
+
+      if(user === req.user.emails[0].value || owner === req.user.emails[0].value){
+        res.json(data);
+
+      }else {
+        res.sendStatus(403)
+      }
+
+
+    } catch(e) {
+
+     console.log(e);
+     res.sendStatus(500);
+    }
     
-   console.log(e);
-   res.sendStatus(500);
+  } else {
+    res.json(null)
   }
   
 });
 
-poll.put('/:id(\\w+)', bodyParser.text(), async (req, res) => {
+poll.delete('/:id(\\w+)', async (req, res) => {
+  const id = parseInt(req.params.id)
+  console.log(id)
+  if (id){
+    try{
+     const data = await db.get(id);
+
+     const owner = data.owner;
+
+      if(owner === req.user.emails[0].value){
+        const deleteStatus = await db.delete(id);
+        console.log(deleteStatus);
+        res.sendStatus(202);
+
+      }else {
+        res.sendStatus(403);
+      }
+
+
+    } catch(e) {
+
+     console.log(e);
+     res.sendStatus(500);
+    }
+    
+  } else {
+    res.sendStatus(500);
+  }
+  
+});
+
+poll.put('/:id(\\w+)', bodyParser.json(), async (req, res) => {
   console.log(req.body)
-  const data = JSON.parse(req.body);
+  const data = req.body;
   const user = data.user;
   const vote = data.vote;
   const pollId = parseInt(req.params.id);
   let dat = await db.put(pollId, user, vote);
-  console.log("1", dat)
+  
   if(dat) {
     console.log(dat, "here")
     wss.broadcast( "-1", pollId, dat); //remove old poll result from all conected ws
@@ -44,57 +98,26 @@ poll.put('/:id(\\w+)', bodyParser.text(), async (req, res) => {
 
   }
   res.send(200);
-  res.send("ok")
+  //res.send("ok")
 });
 
-poll.post('/:id(\\w+)', bodyParser.text(), async (req, res) => {
+poll.post('/:id(\\w+)', bodyParser.json(), async (req, res) => {
   console.log("req")
-  const data = JSON.parse(req.body);
+  const data = req.body;
   console.log("1")
   const pollId = req.params.id;
   delete data["_id"]
   let currentPollId = 0;
   console.log(pollId)
   if(pollId == "NaN"){
-  console.log("2")
-    res.send( (await db.post(pollId, data)).toString());
-//    
-//    MongoClient.connect(url, (err, db) =>{
-//        assert.equal(null, err, "unable to connect to Database");
-//        const poll = db.collection("poll");
-//      
-//        const collection = await poll.findOne({}, {sort: {"pollId": 1}}
-//                                              assert.equal(err, null, "poll error creating");
-//          currentPollId = parseInt(doc.pollId) + 1;
-//          console.log(currentPollId)
-//        })
-//        data.pollId = currentPollId.toString();
-//        poll.insert([data], (err, result) => {
-//          assert.equal(err, null, "unable to input result");
-//      });
-//      db.close();
-//    });
-//    
+    res.send( (await db.create(pollId, data)).toString());
+  
   }else{
-  console.log("3")
-    MongoClient.connect(url, (err, db) =>{
-      console.log("4")
-       data.pollId = parseInt(pollId)
-        assert.equal(null, err, "unable to connect to Database");
-        const poll = db.collection("poll");
-        
-        const collection = poll.updateOne({pollId: parseInt(pollId)}, 
-                                          {$set: data},
-                                          { upsert: true, },
-                                           (err, res) => {
-            assert.equal(null, err, "unable to update poll");
-            console.log("poll updated");
-          })
-        db.close();
-    });
+    const update = await db.update(pollId, data);
+    res.send("ok")
   }
   
-    res.send("ok");
+    //res.send("ok");
 });
 
 /********** End DB Functions ****************/

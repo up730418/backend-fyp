@@ -27,14 +27,32 @@ module.exports.put = async(pollId, user, vote) => {
   return record3;
 };
 
-module.exports.post = async(pollId, data) => {
+module.exports.create = async(pollId, data) => {
    const pollCollection = dbs.collection("poll");
    let lastRec = await pollCollection.findOne({}, {sort: {"pollId": -1}})
    console.log("last rec", lastRec.pollId)
    data.pollId = lastRec.pollId + 1;
    pollCollection.insert([data])
    return data.pollId
-}
+};
+
+module.exports.update = async(pollId, data) => {
+  const pollCollection = dbs.collection("poll");
+  data.pollId = parseInt(pollId)
+  pollCollection.updateOne({pollId: parseInt(pollId)}, 
+                                          {$set: data},
+                                          { upsert: true, });
+   return data.pollId
+ 
+};
+
+module.exports.delete = async(id) => {
+  
+  const pollCollection = dbs.collection("poll");
+  let data = await pollCollection.remove({pollId: parseInt(id)});
+
+  return data;  
+};
 
 
 //module.exports.post = async(id, )

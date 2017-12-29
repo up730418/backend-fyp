@@ -13,6 +13,7 @@
     "express": "^4.16.2",
     "jade": "^1.11.0",
     "mongodb": "^2.2.33",
+    "simple-google-openid": "^0.2.1",
     "ws": "^3.3.0"
   }
 }
