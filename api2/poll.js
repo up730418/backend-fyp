@@ -11,6 +11,7 @@ const googleauth = require('simple-google-openid');
 module.exports = poll;
 
 const db = require('./poll-MongoDB');
+const lessondb = require('./lesson-MongoDB');
 
 poll.use(googleauth('637021493194-nncq03bpm7am8odjsl69ibceoutch5k4.apps.googleusercontent.com'));
 poll.use('*', googleauth.guardMiddleware({ realm: 'jwt' }));
@@ -18,11 +19,11 @@ poll.use('*', googleauth.guardMiddleware({ realm: 'jwt' }));
 /********** DB Functions ****************/
 poll.get('/:id(\\w+)', async (req, res) => {
   const id = parseInt(req.params.id)
-  console.log(id)
   if (id){
     try{
      const data = await db.get(id);
-
+     const lessons = await getAssosiatedLessons(id);
+      
      const user = data.access.find((user) => {
        return user == req.user.emails[0].value;
 
@@ -30,7 +31,7 @@ poll.get('/:id(\\w+)', async (req, res) => {
     const owner = data.owner
 
       if(user === req.user.emails[0].value || owner === req.user.emails[0].value){
-        data.lesson = [1,2,3];
+        data.lesson = lessons;
         res.json(data);
 
       }else {
@@ -61,6 +62,7 @@ poll.delete('/:id(\\w+)', async (req, res) => {
 
       if(owner === req.user.emails[0].value){
         const deleteStatus = await db.delete(id);
+        const removeFromAssosiatedLessons = await removeAssosiatedLessons(id);
         console.log(deleteStatus);
         res.sendStatus(202);
 
@@ -115,6 +117,11 @@ poll.post('/:id(\\w+)', bodyParser.json(), async (req, res) => {
   
   }else{
     const update = await db.update(pollId, data);
+    console.log(data.lesson)
+    data.lesson.forEach(lesson =>{
+      lessondb.updateRelatedItem(parseInt(lesson), "polls", data.pollId, data.title);
+      
+    })
     res.send("ok")
   }
   
@@ -122,6 +129,22 @@ poll.post('/:id(\\w+)', bodyParser.json(), async (req, res) => {
 });
 
 /********** End DB Functions ****************/
+
+/************* Misalanious Functions *******/
+
+getAssosiatedLessons = async(id) => {
+   const lessons = await lessondb.getRelatedData(id, "poll");
+   let lessonsArray = [];
+   lessons.forEach(lesson => lessonsArray.push(lesson.lessonId));
+   return lessonsArray;
+}
+
+removeAssosiatedLessons = async(id) => {
+  const lessons = await getAssosiatedLessons(id);
+  lessons.forEach(lesson => lessondb.deleteRelatedItem(lesson, "polls", id))
+}
+
+/************* End Misalanious Functions *******/
 
 /*** Poll Websockets *****/
 

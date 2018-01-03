@@ -1,9 +1,10 @@
 {
   "name": "f-y-p",
   "version": "8.9.0",
-  "description": "Final year project app",
+  "description": "Final year project Server side",
   "main": "index.js",
   "scripts": {
+    "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "RAW",
@@ -11,7 +12,6 @@
   "dependencies": {
     "ejs": "^2.5.7",
     "express": "^4.16.2",
-    "jade": "^1.11.0",
     "mongodb": "^2.2.33",
     "simple-google-openid": "^0.2.1",
     "ws": "^3.3.0"

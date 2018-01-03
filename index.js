@@ -1,6 +1,8 @@
 const express = require('express');
-const ejs = require('ejs').renderFile
+const ejs = require('ejs').renderFile;
 const app = express();
+const port = process.env.port || 8080;
+
 const allowCrossDomain = function(req, res, next) {
     res.header('Access-Control-Allow-Origin', '*');
     res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
@@ -8,7 +10,7 @@ const allowCrossDomain = function(req, res, next) {
 
     // intercept OPTIONS method
     if ('OPTIONS' == req.method) {
-      res.send(200);
+      res.sendStatus(200);
     }
     else {
       next();
@@ -16,10 +18,14 @@ const allowCrossDomain = function(req, res, next) {
 };
 
 app.use(allowCrossDomain);
-app.use('/api/poll', require('./api/poll'));
-app.use('/api/quote', require('./api/quote'));
-app.use('/api/chat', require('./api/chat'));
-app.use('/api/lesson', require('./api/lesson'));
+app.use('/api/poll', require('./api2/poll.js'));
+app.use('/api/chat', require('./api2/chat.js'));
+app.use('/api/lesson', require('./api2/lesson.js'));
+
+//app.use('/api/poll', require('./api/poll'));
+//app.use('/api/quote', require('./api/quote'));
+//app.use('/api/chat', require('./api/chat'));
+//app.use('/api/lesson', require('./api/lesson'));
 
 //app.use('/', express.static('static'));
 //app.use(express.static('quote', {extensions: ['html']}));
@@ -29,7 +35,6 @@ app.use('/api/lesson', require('./api/lesson'));
 //app.engine('html', ejs);
 //app.set('view engine', 'html');
 
-const port = process.env.port || 8080;
 
 app.listen(port, (err) => {
   if(err){
