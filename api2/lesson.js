@@ -47,7 +47,7 @@ lesson.get('/:id(\\w+)', async (req, res) => {
 });
 
 lesson.get('/', async (req, res) => { 
-  console.log(await db.getAll(req.user.emails[0].value))
+  console.log("all")
   res.json( await db.getAll(req.user.emails[0].value) );
 });
 
@@ -57,8 +57,8 @@ lesson.post('/:id(\\w+)', bodyParser.json(), async (req, res) => {
   const lessonId = req.params.id;
   delete data["_id"]
   let currentPollId = 0;
-  
-  if(lessonId == "NaN"){
+  console.log(lessonId)
+  if(lessonId == "NaN" || lessonId == "0" || lessonId == "na" ){
     res.send( (await db.create(lessonId, data)).toString());
   
   }else{

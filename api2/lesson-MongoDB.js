@@ -84,18 +84,18 @@ module.exports.deleteRelatedItem = async(lessonId, type, itemId) => {
   return update;  
 };
 
-module.exports.create = async(pollId, data) => {
+module.exports.create = async(lessonId, data) => {
    const lessonCollection = dbs.collection("lesson");
-   let lastRec = await lessonCollection.findOne({}, {sort: {"pollId": -1}})
+   let lastRec = await lessonCollection.findOne({}, {sort: {"lessonId": -1}})
    console.log("last rec", lastRec.lessonId)
    data.lessonId = lastRec.lessonId + 1;
    lessonCollection.insert([data])
    return data.lessonId
 };
 
-module.exports.update = async(pollId, data) => {
+module.exports.update = async(lessonId, data) => {
    const lessonCollection = dbs.collection("lesson");
-   lessonCollection.updateOne({lessonId: parseInt(pollId)}, 
+   lessonCollection.updateOne({lessonId: parseInt(lessonId)}, 
                                           {$set: data},
                                           { upsert: true, });
    return data.lessonId

@@ -113,15 +113,16 @@ poll.post('/:id(\\w+)', bodyParser.json(), async (req, res) => {
   let currentPollId = 0;
   console.log(pollId)
   if(pollId == "NaN"){
-    res.send( (await db.create(pollId, data)).toString());
-  
+    
+    const response = (await db.create(pollId, data)).toString()
+    const x = await addAssosiatedLessons(data.lesson, response.toString(), data.title);
+    res.send( response);
+    
   }else{
     const update = await db.update(pollId, data);
+    const x = await addAssosiatedLessons(data.lesson, pollId, data.title);
     console.log(data.lesson)
-    data.lesson.forEach(lesson =>{
-      lessondb.updateRelatedItem(parseInt(lesson), "polls", data.pollId, data.title);
-      
-    })
+    
     res.send("ok")
   }
   
@@ -142,6 +143,12 @@ getAssosiatedLessons = async(id) => {
 removeAssosiatedLessons = async(id) => {
   const lessons = await getAssosiatedLessons(id);
   lessons.forEach(lesson => lessondb.deleteRelatedItem(lesson, "polls", id))
+}
+
+addAssosiatedLessons = async(lessons, pollId, pollTitle) => {
+  lessons.forEach(lesson =>{
+    lessondb.updateRelatedItem(parseInt(lesson), "polls", pollId, pollTitle);
+  })
 }
 
 /************* End Misalanious Functions *******/
