@@ -15,7 +15,7 @@ lesson.use('*', googleauth.guardMiddleware({ realm: 'jwt' }));
 
 lesson.get('/:id(\\w+)', async (req, res) => {
   const id = parseInt(req.params.id)
-  console.log(id)
+//  console.log(id)
   if (id){
     try{
      const data = await db.getById(id);
@@ -47,17 +47,17 @@ lesson.get('/:id(\\w+)', async (req, res) => {
 });
 
 lesson.get('/', async (req, res) => { 
-  console.log("all")
+//  console.log("all")
   res.json( await db.getAll(req.user.emails[0].value) );
 });
 
 lesson.post('/:id(\\w+)', bodyParser.json(), async (req, res) => {
-  console.log("herere")
+//  console.log("herere")
   const data = req.body;
   const lessonId = req.params.id;
   delete data["_id"]
   let currentPollId = 0;
-  console.log(lessonId)
+//  console.log(lessonId)
   if(lessonId == "NaN" || lessonId == "0" || lessonId == "na" ){
     res.send( (await db.create(lessonId, data)).toString());
   
@@ -70,7 +70,7 @@ lesson.post('/:id(\\w+)', bodyParser.json(), async (req, res) => {
 
 lesson.delete('/:id(\\w+)', async (req, res) => {
   const id = parseInt(req.params.id)
-  console.log(id)
+//  console.log(id)
   if (id){
     try{
      const data = await db.getById(id);
@@ -79,7 +79,7 @@ lesson.delete('/:id(\\w+)', async (req, res) => {
 
       if(owner === req.user.emails[0].value){
         const deleteStatus = await db.delete(id);
-        console.log(deleteStatus);
+//        console.log(deleteStatus);
         res.sendStatus(202);
 
       }else {

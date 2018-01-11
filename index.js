@@ -21,6 +21,7 @@ app.use(allowCrossDomain);
 app.use('/api/poll', require('./api2/poll.js'));
 app.use('/api/chat', require('./api2/chat.js'));
 app.use('/api/lesson', require('./api2/lesson.js'));
+app.use('/api/questionnaire', require('./api2/questionnaire.js'));
 
 //app.use('/api/poll', require('./api/poll'));
 //app.use('/api/quote', require('./api/quote'));

@@ -33,7 +33,7 @@ module.exports.create = async(pollId, data) => {
    console.log("last rec", lastRec.pollId)
    data.pollId = lastRec.pollId + 1;
    pollCollection.insert([data])
-   return data.pollId
+   return data.pollId;
 };
 
 module.exports.update = async(pollId, data) => {
@@ -42,7 +42,7 @@ module.exports.update = async(pollId, data) => {
   pollCollection.updateOne({pollId: parseInt(pollId)}, 
                                           {$set: data},
                                           { upsert: true, });
-   return data.pollId
+   return data.pollId;
  
 };
 
@@ -53,10 +53,6 @@ module.exports.delete = async(id) => {
 
   return data;  
 };
-
-
-//module.exports.post = async(id, )
-
 
 
 function updatePoll(doc, pollId, user, vote) {

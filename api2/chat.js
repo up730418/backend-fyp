@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const MongoClient = require('mongodb').MongoClient;
 const assert = require('assert');
 const express = require('express');
+const lessonService = require('./lessonServices');
 
 const googleauth = require('simple-google-openid');
 
@@ -17,10 +18,10 @@ chat.use(googleauth('637021493194-nncq03bpm7am8odjsl69ibceoutch5k4.apps.googleus
 chat.use('*', googleauth.guardMiddleware({ realm: 'jwt' }));
 
 
-chat.get('/:id(\\w+)', async (req, res) => {
+chat.get('/:id', async (req, res) => {
   const room = req.params.id
   try{
-    console.log(req.user)
+//    console.log(req.user)
     res.json(await db.get(room, 50));
   
   } catch(e) {
@@ -32,7 +33,7 @@ chat.get('/:id(\\w+)', async (req, res) => {
   
 });
 
-chat.get('/:id(\\w+)', bodyParser.text(), async (req, res) => {
+chat.get('/:id', bodyParser.text(), async (req, res) => {
   //NEEDS MORE WORK ON FRONtEND TO HAVE A GO BACK FURTHER IN CHAT THING
   const room = req.params.id
   const limit = JSON.parse(reuest.body).limit
@@ -54,8 +55,8 @@ chat.get('/:id(\\w+)', bodyParser.text(), async (req, res) => {
   })
 });
 
-chat.put('/:id(\\w+)', bodyParser.text(), async (req, res) => {
-  console.log(req)
+chat.put('/:id', bodyParser.text(), async (req, res) => {
+//  console.log(req)
   const data = JSON.parse(req.body).data;
   const user = JSON.parse(req.body).user;
   const room = req.params.id;
@@ -83,6 +84,7 @@ wss.on('connection', function(ws) {
           
         case "chat":
           db.put(data.message, data.user, data.room)
+//          console.log(data.message, data.user, data.room)
           wss.broadcast(data.message, data.room, data.user);
           break;
           
