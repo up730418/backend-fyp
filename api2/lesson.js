@@ -56,7 +56,7 @@ lesson.post('/:id(\\w+)', bodyParser.json(), async (req, res) => {
   const data = req.body;
   const lessonId = req.params.id;
   delete data["_id"]
-  let currentPollId = 0;
+  let currentlessonId = 0;
 //  console.log(lessonId)
   if(lessonId == "NaN" || lessonId == "0" || lessonId == "na" ){
     res.send( (await db.create(lessonId, data)).toString());
