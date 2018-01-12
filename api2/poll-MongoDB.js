@@ -30,7 +30,7 @@ module.exports.put = async(pollId, user, vote) => {
 module.exports.create = async(pollId, data) => {
    const pollCollection = dbs.collection("poll");
    let lastRec = await pollCollection.findOne({}, {sort: {"pollId": -1}})
-   console.log("last rec", lastRec.pollId)
+//   console.log("last rec", lastRec.pollId)
    data.pollId = lastRec? lastRec.lessonId + 1 : 1;;
    pollCollection.insert([data])
    return data.pollId

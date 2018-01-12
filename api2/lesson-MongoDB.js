@@ -87,7 +87,7 @@ module.exports.deleteRelatedItem = async(lessonId, type, itemId) => {
 module.exports.create = async(lessonId, data) => {
    const lessonCollection = dbs.collection("lesson");
    let lastRec = await lessonCollection.findOne({}, {sort: {"lessonId": -1}})
-   console.log("last rec", lastRec.lessonId)
+//   console.log("last rec", lastRec.lessonId)
    data.lessonId = lastRec? lastRec.lessonId + 1 : 1;
    lessonCollection.insert([data])
    return data.lessonId
