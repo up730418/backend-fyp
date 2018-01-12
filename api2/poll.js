@@ -107,8 +107,8 @@ poll.post('/:id(\\w+)', bodyParser.json(), async (req, res) => {
   const pollId = req.params.id;
   delete data["_id"]
   let currentPollId = 0;
-  if(pollId == "NaN"){
-    
+  if(pollId == "NaN" || pollId == "0" || pollId == "na"){
+     
     const response = (await db.create(pollId, data)).toString()
     const x = await lessonService.addAssosiatedLessons(data.lesson, "polls",response.toString(), data.title);
     res.send( response);
