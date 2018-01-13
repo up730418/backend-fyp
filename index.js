@@ -2,6 +2,7 @@ const express = require('express');
 const ejs = require('ejs').renderFile;
 const app = express();
 const port = process.env.port || 8080;
+const path = require('path');
 
 const allowCrossDomain = function(req, res, next) {
     res.header('Access-Control-Allow-Origin', '*');
@@ -32,6 +33,11 @@ app.use('/api/questionnaire', require('./api2/questionnaire.js'));
 //app.use(express.static('quote', {extensions: ['html']}));
 //app.use(express.static('chat', {extensions: ['html']}));
 //app.use(express.static('angular', {extensions: ['html']}));
+app.use(express.static(path.join(__dirname, 'angular')));
+//If route dosent exist redirect to angular app
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'angular/index.html'));
+});
 //app.set('view engine', 'html');
 //app.engine('html', ejs);
 //app.set('view engine', 'html');
