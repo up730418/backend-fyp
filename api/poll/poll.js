@@ -3,11 +3,15 @@
 window.addEventListener("load", function() { 
     
   
-  fetch(`poll/12345`, { method: 'GET', 'content-type': 'application/json'})
-    .then((res) => res.json())
-    .then((data) => {
+//  fetch(`poll/12345`, { method: 'GET', 'content-type': 'application/json'})
+//    .then((res) => res.json())
+//    .then((data) => {
        let questions = []
-       data.questions.forEach((question) =>{
+       let data = {}
+       data.questions = ['One', 'Two', 'Three']
+       data.answers = [{answer: "bt0"}, {answer: "bt0"},{answer: "bt0"}, {answer: "bt1"}, {answer: "bt1"}, {answer: "bt2"}]
+       data.title = "Test Poll"
+      data.questions.forEach((question) =>{
          questions.push(question);
        })
     
@@ -18,27 +22,27 @@ window.addEventListener("load", function() {
         pollHandler(result.answer);
       });
 
-    })
+//    })
   
-    ws.addEventListener('connection', function open() {
-        console.log("woop");
-    });
-
-	ws.addEventListener("close", function(data){
-		console.log("Web Socket unexpectadly closed")
-	})
-  ws.addEventListener('message', function(message) {
-    //console.log(message)
-    const messageData = JSON.parse(message.data);
-    messageData.forEach((data) =>{
-      console.log(data.user, data.message)
-      pollHandler(data.user, parseInt(data.message));
-    });
-
-  });
+//    ws.addEventListener('connection', function open() {
+//        console.log("woop");
+//    });
+//
+//	ws.addEventListener("close", function(data){
+//		console.log("Web Socket unexpectadly closed")
+//	})
+//  ws.addEventListener('message', function(message) {
+//    //console.log(message)
+//    const messageData = JSON.parse(message.data);
+//    messageData.forEach((data) =>{
+//      console.log(data.user, data.message)
+//      pollHandler(data.user, parseInt(data.message));
+//    });
+//
+//  });
   
 });
-const ws = new WebSocket('ws://192.168.0.19:1334/12345',"poll");
+//const ws = new WebSocket('ws://192.168.0.19:1334/12345',"poll");
 
 
 function pollHandler(elemId, votes) {

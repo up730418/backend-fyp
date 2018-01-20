@@ -17,13 +17,22 @@ module.exports.get = async(id) => {
 };
 
 module.exports.create = async(questionnaireId, data) => {
-  console.log("here")
   const questionnaireCollection = dbs.collection("questionnaire");
   let lastRec = await questionnaireCollection.findOne({}, {sort: {"questionnaireId": -1}})
-  data.questionnaireId = lastRec.questionnaireId + 1;
+  data.questionnaireId = lastRec? lastRec.questionnaireId + 1 : 1;
   questionnaireCollection.insert([data])
 
   return data.questionnaireId;
+};
+
+module.exports.update = async(questionnaireId, data) => {
+  console.log("update")
+  const questionnaireCollection = dbs.collection("questionnaire");
+  data.questionnaireId = parseInt(questionnaireId)
+  questionnaireCollection.updateOne({questionnaireId: parseInt(questionnaireId)}, 
+                                          {$set: data},
+                                          { upsert: true, });
+   return data.questionnaireId
 };
 
 module.exports.delete = async(id) => {

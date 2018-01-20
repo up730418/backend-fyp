@@ -24,23 +24,14 @@ app.use('/api/chat', require('./api2/chat.js'));
 app.use('/api/lesson', require('./api2/lesson.js'));
 app.use('/api/questionnaire', require('./api2/questionnaire.js'));
 
-//app.use('/api/poll', require('./api/poll'));
-//app.use('/api/quote', require('./api/quote'));
-//app.use('/api/chat', require('./api/chat'));
-//app.use('/api/lesson', require('./api/lesson'));
 
-//app.use('/', express.static('static'));
-//app.use(express.static('quote', {extensions: ['html']}));
-//app.use(express.static('chat', {extensions: ['html']}));
-//app.use(express.static('angular', {extensions: ['html']}));
 app.use(express.static(path.join(__dirname, 'angular')));
+
 //If route dosent exist redirect to angular app
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'angular/index.html'));
 });
-//app.set('view engine', 'html');
-//app.engine('html', ejs);
-//app.set('view engine', 'html');
+
 
 
 app.listen(port, (err) => {

@@ -4,17 +4,17 @@ window.addEventListener("load", function(){
     askNotification()
     getChatData('room1');
     
-    ws.addEventListener('connection', function open() {
-        console.log("woop");
-    });
-		
-	ws.addEventListener('message', function(message) {
-      addMessage(JSON.parse(message.data), true);    
-    });
-	
-	ws.addEventListener("close", function(data){
-		console.log("Web Socket unexpectadly closed")
-	})
+//    ws.addEventListener('connection', function open() {
+//        console.log("woop");
+//    });
+//		
+//	ws.addEventListener('message', function(message) {
+//      addMessage(JSON.parse(message.data), true);    
+//    });
+//	
+//	ws.addEventListener("close", function(data){
+//		console.log("Web Socket unexpectadly closed")
+//	})
   
 	test.addEventListener("change", function(){
       sendMessage();
@@ -143,13 +143,14 @@ function askNotification() {
 }
 
 function getChatData(room){
-  fetch(`chat/${room}`, { method: 'GET', 'content-type': 'application/json'})
-    .then((res) => res.json())
-    .then((data) => {
-        data.reverse()
+//  fetch(`chat/${room}`, { method: 'GET', 'content-type': 'application/json'})
+//    .then((res) => res.json())
+//    .then((data) => {
+//        data.reverse()
+        data = [{user: "rob", data: "Message 1"}, {user: "rob", data: "Message 2"}, {user: "Sam", data: "Message 3"}]
         data.forEach((message) =>{
           //console.log(data);
           addMessage(message);
         })
-  })
+//  })
 }

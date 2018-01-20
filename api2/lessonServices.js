@@ -16,7 +16,7 @@ module.exports.removeAssosiatedLessons = async(id, type) => {
 
 module.exports.addAssosiatedLessons = async(lessons, type, featureId, featureTitle) => {
   lessons.forEach(lesson =>{
-    lessondb.updateRelatedItem(parseInt(lesson), type, pollId, pollTitle);
+    lessondb.updateRelatedItem(parseInt(lesson), type, featureId, featureTitle);
   })
 }
 

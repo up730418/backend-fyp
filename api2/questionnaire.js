@@ -23,7 +23,7 @@ questionnaire.get('/:id(\\w+)', async (req, res) => {
   if (id){
     try{
      const data = await db.get(id);
-     const lessons = await lessonService.getAssosiatedLessons(id, "questionnaire");
+     const lessons = await lessonService.getAssosiatedLessons(id.toString(), "questionairs");
       
      const user = data.access.find((user) => {
        return user == req.user.emails[0].value;
@@ -89,13 +89,16 @@ questionnaire.post('/:id(\\w+)', bodyParser.json(), async (req, res) => {
   if(questionnaireId == "NaN"){
     
     const response = (await db.create(questionnaireId, data)).toString()
-    const x = await lessonService.addAssosiatedLessons(data.lesson, "questionnaires",response.toString(), data.title);
-    res.send( response);
+    console.log("woop woop maybe")
+    const x = await lessonService.addAssosiatedLessons(data.lesson, "questionairs",response.toString(), data.title);
+    console.log(response)
+    res.send(response);
     
   }else{
     const update = await db.update(questionnaireId, data);
-    const x = await lessonService.addAssosiatedLessons(data.lesson, "questionnaires", questionnaireId, data.title);
-    
+    console.log("update2")
+    const x = await lessonService.addAssosiatedLessons(data.lesson, "questionairs", update.toString(), data.title);
+    console.log("update3")
     res.send("ok")
   }
   

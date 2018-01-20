@@ -45,23 +45,20 @@ module.exports.getRelatedData = async(id, type) => {
       break;
   }
   
-  return data.toArray();  
+  return data? data.toArray() : [];  
 };
 
 module.exports.updateRelatedItem = async(lessonId, type, itemId, itemTitle) => {
-  console.log("updating")
   const lessonCollection = dbs.collection("lesson");
   let data = await lessonCollection.findOne({"lessonId": parseInt(lessonId)}); 
   
-  
   item = data[type].find(item => item.id == itemId.toString())
-  
+
   if(item){
     item.title = itemTitle;
     
   } else {
     data[type].push({"id" : itemId.toString(), "title": itemTitle.toString()});
-    console.log(data)
   }
   
   let update = await lessonCollection.updateOne({"_id": data._id}, data);
