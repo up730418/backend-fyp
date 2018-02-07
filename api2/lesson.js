@@ -1,3 +1,5 @@
+const WebSocketServer = require('ws').Server;
+const wss = new WebSocketServer({port: 1337});
 const bodyParser = require('body-parser');
 const MongoClient = require('mongodb').MongoClient;
 const assert = require('assert');
@@ -15,6 +17,7 @@ lesson.use('*', googleauth.guardMiddleware({ realm: 'jwt' }));
 
 lesson.get('/:id(\\w+)', async (req, res) => {
   const id = parseInt(req.params.id)
+  const x = true;
 //  console.log(id)
   if (id){
     try{
@@ -25,11 +28,14 @@ lesson.get('/:id(\\w+)', async (req, res) => {
 
      });
     const owner = data.owner
-
+  
       if(user === req.user.emails[0].value || owner === req.user.emails[0].value){
         res.json(data);
-
-      }else {
+        //Add  user/Class  Logic
+      }else if (x) {
+        res.json(data);
+                
+      } else {
         res.sendStatus(403)
       }
 
@@ -98,4 +104,28 @@ lesson.delete('/:id(\\w+)', async (req, res) => {
   }
   
 });
+
+
+/*** Lessons Websockets *****/
+
+wss.on('connection', function(ws) {
+	console.log("Lesson Web Socket Connected")
+    //console.log(ws.upgradeReq.url);
+  
+	
+  ws.on('message', function(data) {
+		var data = JSON.parse(data)
+        wss.broadcast(data.type, data.lessonId, data.compId)
+        
+	});
+});
+
+wss.broadcast = function broadcast(type, lessonId, compId){
+	wss.clients.forEach(function(client){ 
+		if(lessonId == client.protocol){
+			client.send(JSON.stringify({type: type, compId: compId}))
+		}
+	});
+};
+
 
