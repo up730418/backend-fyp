@@ -17,7 +17,7 @@ user.get('/', async (req, res) => {
  if(userType === "Admin") {
     res.send(await db.getUsers())
   } else {
-    res.sendStatus(403);           
+    res.sendStatus(203);           
   }
 })
 
@@ -38,7 +38,7 @@ user.put('/', bodyParser.json(), async(req, res) => {
   if(userType === "Admin") {
       res.send(await db.updateUser(data.userName, data.firstName, data.lastName, data.userType));
   } else {
-    res.sendStatus(403);           
+    res.sendStatus(203);           
   }
 })
 
@@ -49,7 +49,7 @@ user.delete('/:userName', async(req, res) => {
   if(userType == "Admin") {
     res.send(await db.deleteUser(userName))
   } else {
-    res.sendStatus(403); 
+    res.sendStatus(203); 
   }
   
 })
@@ -57,5 +57,5 @@ user.delete('/:userName', async(req, res) => {
 
 async function checkUserType(userName){
   let user = await db.getByUserName(userName);
-  return user.type;
+  return user.userType;
 }
