@@ -7,6 +7,7 @@ const express = require('express');
 const url = 'mongodb://localhost:27017/data';
 const lesson = express.Router();
 const googleauth = require('simple-google-openid');
+const services = require('./services');
 
 module.exports = lesson;
 

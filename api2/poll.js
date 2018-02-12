@@ -7,7 +7,7 @@ const express = require('express');
 const url = 'mongodb://localhost:27017/data';
 const poll = express.Router();
 const googleauth = require('simple-google-openid');
-const lessonService = require('./lessonServices');
+const services = require('./services');
 
 module.exports = poll;
 
@@ -23,14 +23,14 @@ poll.get('/:id(\\w+)', async (req, res) => {
   if (id){
     try{
      const data = await db.get(id);
-     const lessons = await lessonService.getAssosiatedLessons(id, "poll");
+     const lessons = await services.getAssosiatedLessons(id, "poll");
       
      const user = data.access.find((user) => {
        return user == req.user.emails[0].value;
 
      });
      const owner = data.owner;
-     const admin = await lessonService.isUserAdmin(req.user.emails[0].value)
+     const admin = await services.isUserAdmin(req.user.emails[0].value)
      if(user === req.user.emails[0].value || owner === req.user.emails[0].value || admin ){
         data.lesson = lessons;
         res.json(data);
@@ -59,11 +59,11 @@ poll.delete('/:id(\\w+)', async (req, res) => {
      const data = await db.get(id);
 
      const owner = data.owner;
-     const admin = await lessonService.isUserAdmin(req.user.emails[0].value)
+     const admin = await services.isUserAdmin(req.user.emails[0].value)
 
       if(owner === req.user.emails[0].value || admin){
         const deleteStatus = await db.delete(id);
-        const removeFromAssosiatedLessons = await lessonService.removeAssosiatedLessons(id, "polls");
+        const removeFromAssosiatedLessons = await services.removeAssosiatedLessons(id, "polls");
         console.log(deleteStatus);
         res.sendStatus(202);
 
@@ -118,12 +118,12 @@ poll.post('/:id(\\w+)', bodyParser.json(), async (req, res) => {
   if(pollId == "NaN" || pollId == "0" || pollId == "na"){
      
     const response = (await db.create(pollId, data)).toString()
-    const x = await lessonService.addAssosiatedLessons(data.lesson, "polls",response.toString(), data.title);
+    const x = await services.addAssosiatedLessons(data.lesson, "polls",response.toString(), data.title);
     res.send( response);
     
   }else{
     const update = await db.update(pollId, data);
-    const x = await lessonService.addAssosiatedLessons(data.lesson, "polls", pollId, data.title);
+    const x = await services.addAssosiatedLessons(data.lesson, "polls", pollId, data.title);
     
     res.send("ok")
   }

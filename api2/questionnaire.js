@@ -4,7 +4,7 @@ const bodyParser = require('body-parser');
 const MongoClient = require('mongodb').MongoClient;
 const assert = require('assert');
 const express = require('express');
-const lessonService = require('./lessonServices');
+const services = require('./services');
 
 const googleauth = require('simple-google-openid');
 
@@ -23,14 +23,14 @@ questionnaire.get('/:id(\\w+)', async (req, res) => {
   if (id){
     try{
      const data = await db.get(id);
-     const lessons = await lessonService.getAssosiatedLessons(id.toString(), "questionairs");
+     const lessons = await services.getAssosiatedLessons(id.toString(), "questionairs");
       
      const user = data.access.find((user) => {
        return user == req.user.emails[0].value;
 
      });
      const owner = data.owner
-     const admin = await lessonService.isUserAdmin(req.user.emails[0].value)
+     const admin = await services.isUserAdmin(req.user.emails[0].value)
 
      if(user === req.user.emails[0].value || owner === req.user.emails[0].value || admin){
        data.lesson = lessons;
@@ -59,11 +59,11 @@ questionnaire.delete('/:id(\\w+)', async (req, res) => {
      const data = await db.get(id);
 
      const owner = data.owner;
-     const admin = await lessonService.isUserAdmin(req.user.emails[0].value)
+     const admin = await services.isUserAdmin(req.user.emails[0].value)
 
       if(owner === req.user.emails[0].value || admin){
         const deleteStatus = await db.delete(id);
-        const removeFromAssosiatedLessons = await lessonService.removeAssosiatedLessons(id, "questionnaire");
+        const removeFromAssosiatedLessons = await services.removeAssosiatedLessons(id, "questionnaire");
         res.sendStatus(202);
 
       }else {
@@ -98,13 +98,13 @@ questionnaire.post('/:id(\\w+)', bodyParser.json(), async (req, res) => {
   if(questionnaireId == "NaN"){
     
     const response = (await db.create(questionnaireId, data)).toString()
-    const x = await lessonService.addAssosiatedLessons(data.lesson, "questionairs",response.toString(), data.title);
+    const x = await services.addAssosiatedLessons(data.lesson, "questionairs",response.toString(), data.title);
     res.send(response);
     
   }else{
     
     const update = await db.update(questionnaireId, data);
-    const x = await lessonService.addAssosiatedLessons(data.lesson, "questionairs", update.toString(), data.title);
+    const x = await services.addAssosiatedLessons(data.lesson, "questionairs", update.toString(), data.title);
     res.send("ok")
   }
   

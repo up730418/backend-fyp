@@ -1,5 +1,7 @@
 const lessondb = require('./lesson-MongoDB');
 const userdb = require('./user-MongoDB');
+const teachingClassdb = require('./teachingClass-MongoDB');
+
 /************* Lesson Functions *******/
 
 //Find lessons assosiated with a poll/quiz
@@ -47,10 +49,19 @@ module.exports.isUserOwner = async (userName) => {
 //Find out if a user is allowed to access  a lesson, poll, quiz
 module.exports.isUserAllowedAccess = async (userName, type,  itemId) => {
   let user = await userdb.getByUserName(userName);
+  let teachingClass = await teachingClassdb.getByTeachingClassById(classId);
+
   if(user.userType === "Admin") {
     return true;
-  }
+  } else if ()
   
+}
+
+//Find out if a user is in a class
+module.exports.isUserInClass = async (classId, userName) => {
+  let teachingClass = await teachingClassdb.getByTeachingClassById(classId);
+  let student = teachingClass.students.find(student => student == userName);
+  return student? true : false;
   
 }
 /************* End User Functions *************/

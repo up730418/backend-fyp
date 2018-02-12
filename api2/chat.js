@@ -4,7 +4,7 @@ const bodyParser = require('body-parser');
 const MongoClient = require('mongodb').MongoClient;
 const assert = require('assert');
 const express = require('express');
-const lessonService = require('./lessonServices');
+const services = require('./services');
 
 const googleauth = require('simple-google-openid');
 

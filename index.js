@@ -24,6 +24,7 @@ app.use('/api/chat', require('./api2/chat.js'));
 app.use('/api/lesson', require('./api2/lesson.js'));
 app.use('/api/questionnaire', require('./api2/questionnaire.js'));
 app.use('/api/user', require('./api2/user.js'));
+app.use('/api/teachingClass', require('./api2/teachingClass.js'));
 
 
 app.use(express.static(path.join(__dirname, 'angular')));
