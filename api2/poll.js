@@ -29,9 +29,9 @@ poll.get('/:id(\\w+)', async (req, res) => {
        return user == req.user.emails[0].value;
 
      });
-    const owner = data.owner
-
-      if(user === req.user.emails[0].value || owner === req.user.emails[0].value){
+     const owner = data.owner;
+     const admin = await lessonService.isUserAdmin(req.user.emails[0].value)
+     if(user === req.user.emails[0].value || owner === req.user.emails[0].value || admin ){
         data.lesson = lessons;
         res.json(data);
 
@@ -59,8 +59,9 @@ poll.delete('/:id(\\w+)', async (req, res) => {
      const data = await db.get(id);
 
      const owner = data.owner;
+     const admin = await lessonService.isUserAdmin(req.user.emails[0].value)
 
-      if(owner === req.user.emails[0].value){
+      if(owner === req.user.emails[0].value || admin){
         const deleteStatus = await db.delete(id);
         const removeFromAssosiatedLessons = await lessonService.removeAssosiatedLessons(id, "polls");
         console.log(deleteStatus);
@@ -107,6 +108,13 @@ poll.post('/:id(\\w+)', bodyParser.json(), async (req, res) => {
   const pollId = req.params.id;
   delete data["_id"]
   let currentPollId = 0;
+  if(!data.answers){
+    data.answers = []
+  }
+  //Remove any answers not attributed to a user
+  let cleanAnswers = data.answers.filter(answer => answer.user !== '')
+  data.answers = cleanAnswers? cleanAnswers : []
+  
   if(pollId == "NaN" || pollId == "0" || pollId == "na"){
      
     const response = (await db.create(pollId, data)).toString()

@@ -27,6 +27,7 @@ module.exports.create = async(questionnaireId, data) => {
 
 module.exports.update = async(questionnaireId, data) => {
   console.log("update")
+  console.log(data)
   const questionnaireCollection = dbs.collection("questionnaire");
   data.questionnaireId = parseInt(questionnaireId)
   questionnaireCollection.updateOne({questionnaireId: parseInt(questionnaireId)}, 
@@ -42,3 +43,27 @@ module.exports.delete = async(id) => {
 
   return data;  
 };
+
+module.exports.addResult = async(id, data, user) => {
+  
+  const questionnaireCollection = dbs.collection("questionnaire");
+  //Get quesionnaire data
+  let questionnaireRecord = await questionnaireCollection.findOne({questionnaireId: parseInt(id)});
+  
+  //Check if user already answered
+  let x = questionnaireRecord.answers.find(answer => answer.user === user)
+  
+  if(x){
+    //If user answered update answers
+    x.answer = data
+  } else {
+    //If no answer add answers
+    questionnaireRecord.answers.push({user: user, answer: data})
+  }
+  //Update record
+  let questionaireUpdate = await questionnaireCollection.updateOne({_id: questionnaireRecord["_id"] }, 
+                                          {$set: questionnaireRecord},
+                                          { upsert: true, });
+  return questionaireUpdate;  
+};
+

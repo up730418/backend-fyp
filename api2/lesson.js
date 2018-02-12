@@ -57,6 +57,18 @@ lesson.get('/', async (req, res) => {
   res.json( await db.getAll(req.user.emails[0].value) );
 });
 
+lesson.get('/polls/:id(\\w+)', async (req, res) => { 
+//  console.log("all")
+  const id = parseInt(req.params.id)
+  res.json( await db.getPolls(id) );
+});
+
+lesson.get('/questionnairs/:id(\\w+)', async (req, res) => { 
+//  console.log("all")
+  const id = parseInt(req.params.id)
+  res.json( await db.getQuestionnairs(id) );
+});
+
 lesson.post('/:id(\\w+)', bodyParser.json(), async (req, res) => {
 //  console.log("herere")
   const data = req.body;

@@ -26,6 +26,42 @@ module.exports.getAll = async(owner) => {
   return data.toArray();  
 };
 
+module.exports.getPolls = async(id) => {
+
+  let polls = []
+  const lessonCollection = dbs.collection("lesson");
+  let data = await lessonCollection.findOne({lessonId: parseInt(id)});
+
+  data.polls.forEach(poll => {
+    polls.push({pollId: parseInt(poll.id)})
+  })
+  
+  let pollQuerry = {"$or": polls}
+  
+  const pollCollection = dbs.collection("poll");
+  let pollData = await pollCollection.find(pollQuerry);
+  
+  return pollData.toArray();  
+};
+
+module.exports.getQuestionnairs = async(id) => {
+  let questionnaires = []
+  const lessonCollection = dbs.collection("lesson");
+  let data = await lessonCollection.findOne({lessonId: parseInt(id)});
+
+  data.questionairs.forEach(questionnaire => {
+    
+    questionnaires.push({questionnaireId: parseInt(questionnaire.id)})
+  })
+  
+  let questionnaireQuerry = {"$or": questionnaires}
+  
+  const questionnaireCollection = dbs.collection("questionnaire");
+  let questionnaireData = await questionnaireCollection.find(questionnaireQuerry);
+  
+  return questionnaireData.toArray();  
+};
+
 module.exports.getRelatedData = async(id, type) => {
   
   const lessonCollection = dbs.collection("lesson");

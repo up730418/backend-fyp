@@ -30,8 +30,9 @@ questionnaire.get('/:id(\\w+)', async (req, res) => {
 
      });
      const owner = data.owner
+     const admin = await lessonService.isUserAdmin(req.user.emails[0].value)
 
-     if(user === req.user.emails[0].value || owner === req.user.emails[0].value){
+     if(user === req.user.emails[0].value || owner === req.user.emails[0].value || admin){
        data.lesson = lessons;
        res.json(data);
 
@@ -58,8 +59,9 @@ questionnaire.delete('/:id(\\w+)', async (req, res) => {
      const data = await db.get(id);
 
      const owner = data.owner;
+     const admin = await lessonService.isUserAdmin(req.user.emails[0].value)
 
-      if(owner === req.user.emails[0].value){
+      if(owner === req.user.emails[0].value || admin){
         const deleteStatus = await db.delete(id);
         const removeFromAssosiatedLessons = await lessonService.removeAssosiatedLessons(id, "questionnaire");
         res.sendStatus(202);
@@ -86,19 +88,23 @@ questionnaire.post('/:id(\\w+)', bodyParser.json(), async (req, res) => {
   const questionnaireId = req.params.id;
   delete data["_id"]
   let currentPollId = 0;
+  if(!data.answers){
+    data.answers = []
+  }
+  //Remove any answers not attributed to a user
+  let cleanAnswers = data.answers.filter(answer => answer.user !== '')
+  data.answers = cleanAnswers? cleanAnswers : []
+  
   if(questionnaireId == "NaN"){
     
     const response = (await db.create(questionnaireId, data)).toString()
-    console.log("woop woop maybe")
     const x = await lessonService.addAssosiatedLessons(data.lesson, "questionairs",response.toString(), data.title);
-    console.log(response)
     res.send(response);
     
   }else{
+    
     const update = await db.update(questionnaireId, data);
-    console.log("update2")
     const x = await lessonService.addAssosiatedLessons(data.lesson, "questionairs", update.toString(), data.title);
-    console.log("update3")
     res.send("ok")
   }
   
@@ -107,10 +113,9 @@ questionnaire.post('/:id(\\w+)', bodyParser.json(), async (req, res) => {
 
 questionnaire.put('/:id(\\w+)', bodyParser.json(), async (req, res) => {
   const data = req.body;
-  const user = data.user;
-  const vote = data.vote;
+
   const questionnaireId = parseInt(req.params.id);
-  let dat = await db.put(questionnaireId, user, vote);
+  let dat = await db.addResult(questionnaireId, data, req.user.emails[0].value);
   
   res.send(200);
   //res.send("ok")
