@@ -30,7 +30,7 @@ module.exports.addAssosiatedLessons = async(lessons, type, featureId, featureTit
 //Find out what role the user has e.g. student 
 module.exports.userRole = async (userName) => {
   let user = await userdb.getByUserName(userName);
-  return user.userType;
+  return user? user.userType : null;
 }
 
 //Find out if a user is  admin 

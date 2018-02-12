@@ -16,7 +16,9 @@ user.get('/', async (req, res) => {
   
  if(userType === "Admin") {
     res.send(await db.getUsers())
-  } else {
+  } else if(userType === null){
+    db.createUser(req.user.emails[0].value, req.user.name.givenName, req.user.name.familyName, "")
+  }else {
     res.sendStatus(203);           
   }
 })
@@ -57,5 +59,5 @@ user.delete('/:userName', async(req, res) => {
 
 async function checkUserType(userName){
   let user = await db.getByUserName(userName);
-  return user.userType;
+  return user? user.userType : null ;
 }
