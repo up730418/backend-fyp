@@ -53,8 +53,7 @@ module.exports.isUserAllowedAccess = async (userName, type,  itemId) => {
 
   if(user.userType === "Admin") {
     return true;
-  } else if ()
-  
+  }       
 }
 
 //Find out if a user is in a class
