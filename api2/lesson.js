@@ -16,6 +16,12 @@ const db = require('./lesson-MongoDB');
 lesson.use(googleauth('637021493194-nncq03bpm7am8odjsl69ibceoutch5k4.apps.googleusercontent.com'));
 lesson.use('*', googleauth.guardMiddleware({ realm: 'jwt' }));
 
+
+lesson.get('/studentLessons', async (req, res) => { 
+//  console.log("all")
+  res.json( await db.getStudentLessons(req.user.emails[0].value) );
+});
+
 lesson.get('/:id(\\w+)', async (req, res) => {
   const id = parseInt(req.params.id)
   const x = true;

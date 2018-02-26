@@ -72,12 +72,12 @@ module.exports.isUserAllowedAccess = async (userName, data) => {
     return true;
   }
   //Check if user is in the access array
-  const user = data.access.find((user) => {
+  const userAccess = data.access.find((user) => {
     return user == req.user.emails[0].value;
 
    });
   
-  if(user === userName) {
+  if(userAccess === userName) {
     return true;
   }
   return false;

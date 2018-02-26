@@ -26,6 +26,14 @@ module.exports.getAll = async(owner) => {
   return data.toArray();  
 };
 
+module.exports.getStudentLessons = async(owner) => {
+  
+  const lessonCollection = dbs.collection("lesson");
+  let data = await lessonCollection.find({owner: owner});
+
+  return data.toArray();  
+};
+
 module.exports.getPolls = async(id) => {
 
   let polls = []
