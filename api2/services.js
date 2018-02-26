@@ -37,23 +37,50 @@ module.exports.userRole = async (userName) => {
 
 //Find out if a user is  admin 
 module.exports.isUserAdmin = async (userName) => {
-    let user = await userdb.getByUserName(userName);
+  let user = await userdb.getByUserName(userName);
   return user.userType === "Admin";
 }
 
 //Find out if a user is  owner of a poll, lesson, quiz 
-module.exports.isUserOwner = async (userName) => {
+module.exports.isUserOwner = async (userName, data) => {
+  if(userName == data.owner) {
+    return true;
+  }
   
+  return false;
+}
+//Find out if a user is  owner of a poll, lesson, quiz or an Admin
+module.exports.isUserOwnerOrAdmin = async (userName, data) => {
+  if(userName == data.owner) {
+    return true;
+  }
+  let user = await userdb.getByUserName(userName);
+  
+  if(user.userType == "Admin"){
+    return true;
+    
+  }
+  return false;
 }
 
 //Find out if a user is allowed to access  a lesson, poll, quiz
-module.exports.isUserAllowedAccess = async (userName, type,  itemId) => {
+module.exports.isUserAllowedAccess = async (userName, data) => {
   let user = await userdb.getByUserName(userName);
-  let teachingClass = await teachingClassdb.getByTeachingClassById(classId);
+//  let teachingClass = await teachingClassdb.getByTeachingClassById(classId);
 
   if(user.userType === "Admin") {
     return true;
-  }       
+  }
+  //Check if user is in the access array
+  const user = data.access.find((user) => {
+    return user == req.user.emails[0].value;
+
+   });
+  
+  if(user === userName) {
+    return true;
+  }
+  return false;
 }
 
 //Find out if a user is in a class

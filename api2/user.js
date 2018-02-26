@@ -13,21 +13,22 @@ user.use('*', googleauth.guardMiddleware({ realm: 'jwt' }));
 
 
 user.get('/', async (req, res) => {
- const userType = await services.userRole(req.user.emails[0].value)
+ const userName = req.user.emails[0].value
+ const userType = await services.userRole(userName)
   
- if(userType === "Admin") {
+ if(services.isUserAdmin(userName)) {
     res.send(await db.getUsers())
+   
   } else if(userType === null){
     db.createUser(req.user.emails[0].value, req.user.name.givenName, req.user.name.familyName, "")
-    res.sendStatus(202);           
+    res.sendStatus(202);  
+    
   }else {
     res.sendStatus(203);           
   }
 })
 
 user.get('/userType', async(req, res) => {
-  console.log("userType")
-  console.log(await services.userRole(req.user.emails[0].value))
   res.send(await services.userRole(req.user.emails[0].value))
 })
 
@@ -44,8 +45,8 @@ user.post('/', bodyParser.json(), async(req, res) => {
 
 user.put('/', bodyParser.json(), async(req, res) => {
   const data = req.body
-  const userType = await services.userRole(req.user.emails[0].value)
-  if(userType === "Admin") {
+  
+  if(services.isUserAdmin(userName)) {
       res.send(await db.updateUser(data.userName, data.firstName, data.lastName, data.userType));
   } else {
     res.sendStatus(203);           
@@ -54,19 +55,11 @@ user.put('/', bodyParser.json(), async(req, res) => {
 
 user.delete('/:userName', async(req, res) => {
   const userName = req.params.userName
-  const userType = await services.userRole(req.user.emails[0].value)
   
-  if(userType == "Admin") {
+  if(services.isUserAdmin(userName)) {
     res.send(await db.deleteUser(userName))
   } else {
     res.sendStatus(203); 
   }
   
 })
-
-
-
-async function checkUserType(userName){
-  let user = await db.getByUserName(userName);
-  return user? user.userType : null ;
-}
