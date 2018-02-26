@@ -11,6 +11,7 @@ const db = require('./user-MongoDB');
 user.use(googleauth('637021493194-nncq03bpm7am8odjsl69ibceoutch5k4.apps.googleusercontent.com'));
 user.use('*', googleauth.guardMiddleware({ realm: 'jwt' }));
 
+
 user.get('/', async (req, res) => {
  const userType = await services.userRole(req.user.emails[0].value)
   
@@ -22,6 +23,12 @@ user.get('/', async (req, res) => {
   }else {
     res.sendStatus(203);           
   }
+})
+
+user.get('/userType', async(req, res) => {
+  console.log("userType")
+  console.log(await services.userRole(req.user.emails[0].value))
+  res.send(await services.userRole(req.user.emails[0].value))
 })
 
 user.get('/:userName', async (req, res) => {
@@ -56,6 +63,7 @@ user.delete('/:userName', async(req, res) => {
   }
   
 })
+
 
 
 async function checkUserType(userName){
