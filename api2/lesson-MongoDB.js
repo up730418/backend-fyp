@@ -17,6 +17,14 @@ module.exports.getById = async(id) => {
   return data;  
 };
 
+module.exports.getByIds = async(ids) => {
+  
+  const lessonCollection = dbs.collection("lesson");
+  let data = await lessonCollection.find({lessonId: {"$in": ids}});
+
+  return data? data.toArray() : [];  
+};
+
 
 module.exports.getAll = async(owner) => {
   
@@ -26,10 +34,10 @@ module.exports.getAll = async(owner) => {
   return data.toArray();  
 };
 
-module.exports.getStudentLessons = async(owner) => {
+module.exports.getStudentLessons = async(user) => {
   
   const lessonCollection = dbs.collection("lesson");
-  let data = await lessonCollection.find({owner: owner});
+  let data = await lessonCollection.find({access: {"$in": user}});
 
   return data.toArray();  
 };

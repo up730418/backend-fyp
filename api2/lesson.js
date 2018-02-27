@@ -19,7 +19,20 @@ lesson.use('*', googleauth.guardMiddleware({ realm: 'jwt' }));
 
 lesson.get('/studentLessons', async (req, res) => { 
 //  console.log("all")
-  res.json( await db.getStudentLessons(req.user.emails[0].value) );
+  console.log("1")
+  const userName = req.user.emails[0].value;
+  console.log("2")
+  let userAccess = await services.getUsersTeachingClasses(userName);
+  console.log("3")
+  userAccess.push(userName);
+  console.log(userAccess)
+  console.log("4")
+  
+  console.log(await db.getStudentLessons(userAccess));
+  let lessonData = await db.getStudentLessons(userAccess)
+  lessonData.push(userAccess)
+  console.log("5")
+  res.json(lessonData);
 });
 
 lesson.get('/:id(\\w+)', async (req, res) => {

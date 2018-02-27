@@ -16,6 +16,13 @@ module.exports.getTeachingClass = async() => {
   return data? data.toArray() : [];  ;  
 };
 
+module.exports.getUsersTeachingClasses = async(userName) => {
+  const teachingClassCollection = dbs.collection("teachingClass");
+  let data = await teachingClassCollection.find({"students" : {"$in": [userName]}}, {name: 1, _id: 0});
+  
+  return data? data.toArray() : [];  ;  
+};
+
 module.exports.getByTeachingClassName = async(name) => {
   const teachingClassCollection = dbs.collection("teachingClass");
   let data = await teachingClassCollection.findOne({name: name});

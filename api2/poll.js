@@ -24,14 +24,9 @@ poll.get('/:id(\\w+)', async (req, res) => {
     try{
      const data = await db.get(id);
      const lessons = await services.getAssosiatedLessons(id, "poll");
-      
-     const user = data.access.find((user) => {
-       return user == req.user.emails[0].value;
-
-     });
-     const owner = data.owner;
-     const admin = await services.isUserAdmin(req.user.emails[0].value)
-     if(user === req.user.emails[0].value || owner === req.user.emails[0].value || admin ){
+     const access = await services.isUserAllowedAccess(req.user.emails[0].value, data)
+     console.log("access", access)
+      if(access){
         data.lesson = lessons;
         res.json(data);
 
@@ -57,11 +52,9 @@ poll.delete('/:id(\\w+)', async (req, res) => {
   if (id){
     try{
      const data = await db.get(id);
-
-     const owner = data.owner;
-     const admin = await services.isUserAdmin(req.user.emails[0].value)
-
-      if(owner === req.user.emails[0].value || admin){
+     const access = await services.isUserOwnerOrAdmin(req.user.emails[0].value, data)
+      
+     if(access){
         const deleteStatus = await db.delete(id);
         const removeFromAssosiatedLessons = await services.removeAssosiatedLessons(id, "polls");
         console.log(deleteStatus);

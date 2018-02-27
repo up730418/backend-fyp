@@ -14,8 +14,10 @@ teachingClass.use('*', googleauth.guardMiddleware({ realm: 'jwt' }));
 
 teachingClass.get('/', async (req, res) => {
  const userType = await services.userRole(req.user.emails[0].value)
-  console.log(await db.getTeachingClass())
- if(userType === "Admin") {
+  console.log("getUsersTeachingClasses")
+ console.log(await db.getUsersTeachingClasses(req.user.emails[0].value))
+ 
+  if(userType === "Admin") {
     res.send(await db.getTeachingClass())
  }
 })

@@ -67,19 +67,66 @@ module.exports.isUserOwnerOrAdmin = async (userName, data) => {
 module.exports.isUserAllowedAccess = async (userName, data) => {
   let user = await userdb.getByUserName(userName);
 //  let teachingClass = await teachingClassdb.getByTeachingClassById(classId);
-
   if(user.userType === "Admin") {
     return true;
   }
+  //Check what Teaching classes the user is in
+  let teachingClassesRes = await teachingClassdb.getUsersTeachingClasses(userName);
+  let teachingClasses = []
+  teachingClassesRes.forEach((name) => {
+   teachingClasses.push(name.name);
+  })
+  
   //Check if user is in the access array
   const userAccess = data.access.find((user) => {
-    return user == req.user.emails[0].value;
-
+    return user == userName;
    });
-  
+  console.log("user Acess", userAccess === userName)
+  //If there allowed access in this array
   if(userAccess === userName) {
     return true;
   }
+  //Check if any classes are in the access list
+  const classAccess = data.access.find((cla) => {
+    console.log(teachingClasses, cla)
+    return teachingClasses.includes(cla);
+   });
+  console.log("class Access", classAccess)
+  // If they are in a class assosiated whith this item
+  if(classAccess !== undefined) {
+    return true;
+  }
+  
+  //Gather the lesson data
+  let lessonIds = []
+  data.lesson.forEach((lesson) => {
+    lessonIds.push(parseInt(lesson))
+  })
+  
+  const lessonData = await lessondb.getByIds(lessonIds)
+  
+  // Check if lessons allow a user to access the content
+  let access = false
+  lessonData.forEach((lesson) => {
+
+    const userAccess = lesson.access.find((user) => {
+      return user == userName;
+    });
+    
+    const classAccess = lesson.access.find((cla) => {
+      return teachingClasses.includes(cla);
+    });
+    
+    if(userAccess || classAccess){
+      access = true;
+    }
+  });
+  // If the lesson allows access
+  if(access) {
+    return true;
+  }
+  
+  //If all else fails Kick em out!
   return false;
 }
 
@@ -90,5 +137,21 @@ module.exports.isUserInClass = async (classId, userName) => {
   return student? true : false;
   
 }
+
+module.exports.getUsersTeachingClasses = async (userName) => {
+  let teachingClasses = [];
+  console.log("2.1")
+  let teachingClassesRes = await teachingClassdb.getUsersTeachingClasses(userName);
+  console.log("2.2")
+  //Turn it into an array of strings
+  teachingClassesRes.forEach((name) => {
+  console.log("2.3")
+   teachingClasses.push(name.name);
+  })
+  console.log("2.4")
+  console.log(teachingClasses)
+  return teachingClasses;
+}
 /************* End User Functions *************/
+
 
