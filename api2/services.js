@@ -1,6 +1,8 @@
 const lessondb = require('./lesson-MongoDB');
 const userdb = require('./user-MongoDB');
 const teachingClassdb = require('./teachingClass-MongoDB');
+const polldb = require('./poll-MongoDB');
+const questionnairedb = require('./questionnaire-MongoDB');
 
 /************* Lesson Functions *******/
 
@@ -40,6 +42,12 @@ module.exports.isUserAdmin = async (userName) => {
   let user = await userdb.getByUserName(userName);
   return user.userType === "Admin";
 }
+//Find out if a user is  admin or teacher
+module.exports.isUserAdminOrTeacher = async (userName) => {
+  let user = await userdb.getByUserName(userName);
+  const access = user.userType === "Admin" || user.userType === "Teacher"
+  return access;
+}
 
 //Find out if a user is  owner of a poll, lesson, quiz 
 module.exports.isUserOwner = async (userName, data) => {
@@ -70,6 +78,10 @@ module.exports.isUserAllowedAccess = async (userName, data) => {
   if(user.userType === "Admin") {
     return true;
   }
+  // Check if the user is the owner of the data
+  if(userName  == data.owner){
+    return true;
+  }
   //Check what Teaching classes the user is in
   let teachingClassesRes = await teachingClassdb.getUsersTeachingClasses(userName);
   let teachingClasses = []
@@ -81,17 +93,14 @@ module.exports.isUserAllowedAccess = async (userName, data) => {
   const userAccess = data.access.find((user) => {
     return user == userName;
    });
-  console.log("user Acess", userAccess === userName)
   //If there allowed access in this array
   if(userAccess === userName) {
     return true;
   }
   //Check if any classes are in the access list
   const classAccess = data.access.find((cla) => {
-    console.log(teachingClasses, cla)
     return teachingClasses.includes(cla);
    });
-  console.log("class Access", classAccess)
   // If they are in a class assosiated whith this item
   if(classAccess !== undefined) {
     return true;
@@ -140,18 +149,27 @@ module.exports.isUserInClass = async (classId, userName) => {
 
 module.exports.getUsersTeachingClasses = async (userName) => {
   let teachingClasses = [];
-  console.log("2.1")
   let teachingClassesRes = await teachingClassdb.getUsersTeachingClasses(userName);
-  console.log("2.2")
   //Turn it into an array of strings
   teachingClassesRes.forEach((name) => {
-  console.log("2.3")
    teachingClasses.push(name.name);
   })
-  console.log("2.4")
-  console.log(teachingClasses)
   return teachingClasses;
 }
 /************* End User Functions *************/
 
+/************* Update visibility **************/
+module.exports.switchPoll = async(pollId, visibility) => {
+  let update;
+  if(visibility) {
+    update = await polldb.switchHidden(pollId, visibility);
+  } else {
+    const pollData = await polldb.get(pollId);
+    vis = !pollData.hidden
+    update = await polldb.switchHidden(pollId, vis);
+  }
+  
+  return update;
+}
 
+/************* End Update visibility **************/

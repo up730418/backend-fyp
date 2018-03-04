@@ -24,15 +24,8 @@ questionnaire.get('/:id(\\w+)', async (req, res) => {
     try{
      const data = await db.get(id);
      const lessons = await services.getAssosiatedLessons(id.toString(), "questionairs");
-      
-     const user = data.access.find((user) => {
-       return user == req.user.emails[0].value;
 
-     });
-     const owner = data.owner
-     const admin = await services.isUserAdmin(req.user.emails[0].value)
-
-     if(user === req.user.emails[0].value || owner === req.user.emails[0].value || admin){
+     if(await services.isUserAllowedAccess(req.user.emails[0].value, data)){
        data.lesson = lessons;
        res.json(data);
 
@@ -56,12 +49,8 @@ questionnaire.delete('/:id(\\w+)', async (req, res) => {
   const id = parseInt(req.params.id)
   if (id){
     try{
-     const data = await db.get(id);
 
-     const owner = data.owner;
-     const admin = await services.isUserAdmin(req.user.emails[0].value)
-
-      if(owner === req.user.emails[0].value || admin){
+      if(await services.isUserOwnerOrAdmin(req.user.emails[0].value, data)){
         const deleteStatus = await db.delete(id);
         const removeFromAssosiatedLessons = await services.removeAssosiatedLessons(id, "questionnaire");
         res.sendStatus(202);
@@ -84,28 +73,32 @@ questionnaire.delete('/:id(\\w+)', async (req, res) => {
 });
 
 questionnaire.post('/:id(\\w+)', bodyParser.json(), async (req, res) => {
-  const data = req.body;
-  const questionnaireId = req.params.id;
-  delete data["_id"]
-  let currentPollId = 0;
-  if(!data.answers){
-    data.answers = []
-  }
-  //Remove any answers not attributed to a user
-  let cleanAnswers = data.answers.filter(answer => answer.user !== '')
-  data.answers = cleanAnswers? cleanAnswers : []
-  
-  if(questionnaireId == "NaN"){
-    
-    const response = (await db.create(questionnaireId, data)).toString()
-    const x = await services.addAssosiatedLessons(data.lesson, "questionairs",response.toString(), data.title);
-    res.send(response);
-    
-  }else{
-    
-    const update = await db.update(questionnaireId, data);
-    const x = await services.addAssosiatedLessons(data.lesson, "questionairs", update.toString(), data.title);
-    res.send("ok")
+  if(await  services.isUserAdminOrTeacher(req.user.emails[0].value)){
+    const data = req.body;
+    const questionnaireId = req.params.id;
+    delete data["_id"]
+    let currentPollId = 0;
+    if(!data.answers){
+      data.answers = []
+    }
+    //Remove any answers not attributed to a user
+    let cleanAnswers = data.answers.filter(answer => answer.user !== '')
+    data.answers = cleanAnswers? cleanAnswers : []
+
+    if(questionnaireId == "NaN"){
+
+      const response = (await db.create(questionnaireId, data)).toString()
+      const x = await services.addAssosiatedLessons(data.lesson, "questionairs",response.toString(), data.title);
+      res.send(response);
+
+    }else{
+
+      const update = await db.update(questionnaireId, data);
+      const x = await services.addAssosiatedLessons(data.lesson, "questionairs", update.toString(), data.title);
+      res.send("ok")
+    }
+  } else {
+    res.sendStatus(403)
   }
   
 });

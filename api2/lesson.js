@@ -18,43 +18,27 @@ lesson.use('*', googleauth.guardMiddleware({ realm: 'jwt' }));
 
 
 lesson.get('/studentLessons', async (req, res) => { 
-//  console.log("all")
-  console.log("1")
   const userName = req.user.emails[0].value;
-  console.log("2")
   let userAccess = await services.getUsersTeachingClasses(userName);
-  console.log("3")
   userAccess.push(userName);
-  console.log(userAccess)
-  console.log("4")
   
-  console.log(await db.getStudentLessons(userAccess));
   let lessonData = await db.getStudentLessons(userAccess)
   lessonData.push(userAccess)
-  console.log("5")
+  
   res.json(lessonData);
 });
 
 lesson.get('/:id(\\w+)', async (req, res) => {
   const id = parseInt(req.params.id)
-  const x = true;
+  const userName = req.user.emails[0].value;
 //  console.log(id)
   if (id){
     try{
      const data = await db.getById(id);
-
-     const user = data.access.find((user) => {
-       return user == req.user.emails[0].value;
-
-     });
-    const owner = data.owner
   
-      if(user === req.user.emails[0].value || owner === req.user.emails[0].value){
-        res.json(data);
+      if(await services.isUserAllowedAccess(userName, data)){
+        res.json(data); 
         //Add  user/Class  Logic
-      }else if (x) {
-        res.json(data);
-                
       } else {
         res.sendStatus(403)
       }
@@ -78,30 +62,69 @@ lesson.get('/', async (req, res) => {
 });
 
 lesson.get('/polls/:id(\\w+)', async (req, res) => { 
-//  console.log("all")
+
   const id = parseInt(req.params.id)
   res.json( await db.getPolls(id) );
 });
 
 lesson.get('/questionnairs/:id(\\w+)', async (req, res) => { 
-//  console.log("all")
   const id = parseInt(req.params.id)
   res.json( await db.getQuestionnairs(id) );
 });
 
-lesson.post('/:id(\\w+)', bodyParser.json(), async (req, res) => {
-//  console.log("herere")
-  const data = req.body;
-  const lessonId = req.params.id;
-  delete data["_id"]
-  let currentlessonId = 0;
-//  console.log(lessonId)
-  if(lessonId == "NaN" || lessonId == "0" || lessonId == "na" ){
-    res.send( (await db.create(lessonId, data)).toString());
+lesson.post('/confidence', bodyParser.json(), async (req, res) => {
+  const userName = req.user.emails[0].value;
+  const level = req.body.level
+  const lessonId = parseInt(req.body.lessonId)
   
-  }else{
-    const update = await db.update(lessonId, data);
-    res.send("ok")
+  const x = await(db.saveConfidence(level, lessonId, userName));  
+  res.send("ok")
+})
+
+lesson.post('/endLesson/:id', async (req, res) => {
+  const userName = req.user.emails[0].value;
+  const lessonId = req.params.id;
+  const lesson = await db.getById(lessonId);
+  
+  if(services.isUserOwnerOrAdmin(userName, lesson)){
+    
+    const polls = await db.getPolls(lessonId)
+    const questionnaires = await db.getQuestionnairs(lessonId)
+    let pollIds = []
+    let questionnaireIds = []
+    polls.forEach((poll) => {
+      services.switchPoll(poll.pollId, false)
+      pollIds.push(poll.pollId)
+    })
+    db.switchPoll(lessonId, pollIds, false) 
+    
+    questionnaires.forEach((questionnaire) => {
+      services.switchQuestionnaire(questionnaire.questionnaireId, false)
+      questionnaireIds.push(questionnaire.questionnaireId)
+    })
+    db.switchQuestionnaire(lessonId, questionnaireIds, false)        
+    
+  }
+  res.send("ok")
+});
+
+lesson.post('/:id(\\w+)', bodyParser.json(), async (req, res) => {
+  if(await services.isUserAdminOrTeacher){
+    const data = req.body;
+    const lessonId = req.params.id;
+    delete data["_id"]
+    let currentlessonId = 0;
+
+    if(lessonId == "NaN" || lessonId == "0" || lessonId == "na" ){
+      data.confidence = [];
+      res.send( (await db.create(lessonId, data)).toString());
+
+    }else{
+      const update = await db.update(lessonId, data);
+      res.send("ok")
+    }
+  } else {
+    res.sendSatus(403)
   }
   
 });
@@ -113,11 +136,8 @@ lesson.delete('/:id(\\w+)', async (req, res) => {
     try{
      const data = await db.getById(id);
 
-     const owner = data.owner;
-
-      if(owner === req.user.emails[0].value){
+      if(await services.isUserOwnerOrAdmin(req.user.emails[0].value, data)){
         const deleteStatus = await db.delete(id);
-//        console.log(deleteStatus);
         res.sendStatus(202);
 
       }else {
@@ -146,10 +166,21 @@ wss.on('connection', function(ws) {
   
 	
   ws.on('message', function(data) {
-		var data = JSON.parse(data)
-        wss.broadcast(data.type, data.lessonId, data.compId)
-        
-	});
+    var data = JSON.parse(data)
+    wss.broadcast(data.type, data.lessonId, data.compId)
+
+    switch(data.type) {
+      case "quizSwitch":
+        console.log("1")
+        db.switchLessonQuestionnaire(data.lessonId, data.compId)
+        break;
+
+      case "pollSwitch":
+        console.log("2")
+        db.switchLessonPoll(data.lessonId, data.compId)
+        break;
+    }
+  });
 });
 
 wss.broadcast = function broadcast(type, lessonId, compId){

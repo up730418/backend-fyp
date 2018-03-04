@@ -47,6 +47,16 @@ module.exports.update = async(pollId, data) => {
  
 };
 
+module.exports.switchHidden = async(pollId, value) => {
+  const pollCollection = dbs.collection("poll");
+  console.log("switc1")
+  const update = pollCollection.updateOne({pollId: parseInt(pollId)}, 
+                                          {$set: {hidden: value}},
+                                          { upsert: true, });
+  console.log("switc2")
+  return update;
+}
+
 module.exports.delete = async(id) => {
   
   const pollCollection = dbs.collection("poll");

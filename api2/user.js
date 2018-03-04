@@ -16,7 +16,7 @@ user.get('/', async (req, res) => {
  const userName = req.user.emails[0].value
  const userType = await services.userRole(userName)
 
- if(services.isUserAdmin(userName)) {
+ if(await services.isUserAdmin(userName)) {
     res.send(await db.getUsers())
    
   } else if(userType === null){
@@ -46,8 +46,8 @@ user.post('/', bodyParser.json(), async(req, res) => {
 user.put('/', bodyParser.json(), async(req, res) => {
   const data = req.body
   const admin = await services.isUserAdmin(req.user.emails[0].value)
-  if(admin) {
-      res.send(await db.updateUser(data.userName, data.firstName, data.lastName, data.userType));
+  if(await services.isUserAdmin(req.user.emails[0].value)) {
+    res.send(await db.updateUser(data.userName, data.firstName, data.lastName, data.userType));
   } else {
     res.sendStatus(203);           
   }
@@ -56,7 +56,7 @@ user.put('/', bodyParser.json(), async(req, res) => {
 user.delete('/:userName', async(req, res) => {
   const userName = req.user.emails[0].value
   
-  if(services.isUserAdmin(userName)) {
+  if(await services.isUserAdmin(userName)) {
     res.send(await db.deleteUser(userName))
   } else {
     res.sendStatus(203); 

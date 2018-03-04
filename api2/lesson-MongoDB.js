@@ -56,8 +56,7 @@ module.exports.getPolls = async(id) => {
   
   const pollCollection = dbs.collection("poll");
   let pollData = await pollCollection.find(pollQuerry);
-  
-  return pollData.toArray();  
+  return pollData? pollData.toArray() : [];  
 };
 
 module.exports.getQuestionnairs = async(id) => {
@@ -74,8 +73,7 @@ module.exports.getQuestionnairs = async(id) => {
   
   const questionnaireCollection = dbs.collection("questionnaire");
   let questionnaireData = await questionnaireCollection.find(questionnaireQuerry);
-  
-  return questionnaireData.toArray();  
+  return questionnaireData? questionnaireData.toArray(): [];  
 };
 
 module.exports.getRelatedData = async(id, type) => {
@@ -150,6 +148,83 @@ module.exports.update = async(lessonId, data) => {
    return data.lessonId
  
 };
+
+module.exports.saveConfidence = async(level, lessonId, userName) => {
+  const lessonCollection = dbs.collection("lesson");
+  //   const data = await lessonCollection.findOneAndUpdate({"lessonId": lessonId},
+  //                                             {$set: {"confidence": {"userName": userName,  "level": level}}},
+  //                                             {upsert: true})
+  let data = await lessonCollection.findOne({"lessonId": parseInt(lessonId)}); 
+//  data.confidence = []
+  item = data.confidence.find(item => item.userName == userName)
+
+  if(item) {
+    item.level = level;
+  } else {
+    data.confidence.push({userName: userName, level: level})
+  }
+
+  let update = await lessonCollection.updateOne({"_id": data._id}, data);
+  return update;
+  return userAnswered;
+   
+}
+
+module.exports.switchPoll = async(lessonId, pollIds, visibility) => {
+  const lessonCollection = dbs.collection("lesson");
+  let data = await lessonCollection.findOne({"lessonId": parseInt(lessonId)}); 
+  pollIds.forEach((pollId) => {
+    item = data.polls.find(item => item.id == pollId.toString())
+    item.hidden = visibility;
+    console.log(item)
+  })  
+  let update = await lessonCollection.updateOne({"_id": data._id}, data);
+  return update;
+}
+
+module.exports.switchQuestionnaire = async(lessonId, questionnaireIds, visibility) =>{
+  const lessonCollection = dbs.collection("lesson");
+  let data = await lessonCollection.findOne({"lessonId": parseInt(lessonId)}); 
+  questionnaireIds.forEach((questionnaireId) => {
+    item = data.questionairs.find(item => item.id == questionnaireId.toString())
+    item.hidden = visibility;
+    console.log(item)
+  })
+  
+  let update = await lessonCollection.updateOne({"_id": data._id}, data);
+  
+  return update;
+}
+module.exports.switchLessonPoll = async(lessonId, pollId, visibility) => {
+  const lessonCollection = dbs.collection("lesson");
+  let data = await lessonCollection.findOne({"lessonId": parseInt(lessonId)}); 
+  item = data.polls.find(item => item.id == pollId.toString())
+  
+  if(visibility) {
+    item.hidden = visibility;
+  } else {
+    item.hidden = item.hidden? !item.hidden : true 
+  }
+
+  let update = await lessonCollection.updateOne({"_id": data._id}, data);
+  return update;
+}
+
+module.exports.switchLessonQuestionnaire = async(lessonId, questionnaireId, visibility) => {
+  const lessonCollection = dbs.collection("lesson");
+  let data = await lessonCollection.findOne({"lessonId": parseInt(lessonId)}); 
+  item = data.questionairs.find(item => item.id == questionnaireId.toString())
+  
+  if(visibility) {
+    item.hidden = visibility;
+  } else {
+    item.hidden = item.hidden? !item.hidden : true 
+  }
+  
+  let update = await lessonCollection.updateOne({"_id": data._id}, data);
+  
+  return updated;
+}
 
 module.exports.delete = async(id) => {
   

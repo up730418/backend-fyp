@@ -24,10 +24,9 @@ poll.get('/:id(\\w+)', async (req, res) => {
     try{
      const data = await db.get(id);
      const lessons = await services.getAssosiatedLessons(id, "poll");
+     data.lesson = lessons;
      const access = await services.isUserAllowedAccess(req.user.emails[0].value, data)
-     console.log("access", access)
       if(access){
-        data.lesson = lessons;
         res.json(data);
 
       }else {
@@ -97,28 +96,33 @@ poll.put('/:id(\\w+)', bodyParser.json(), async (req, res) => {
 });
 
 poll.post('/:id(\\w+)', bodyParser.json(), async (req, res) => {
-  const data = req.body;
-  const pollId = req.params.id;
-  delete data["_id"]
-  let currentPollId = 0;
-  if(!data.answers){
-    data.answers = []
-  }
-  //Remove any answers not attributed to a user
-  let cleanAnswers = data.answers.filter(answer => answer.user !== '')
-  data.answers = cleanAnswers? cleanAnswers : []
-  
-  if(pollId == "NaN" || pollId == "0" || pollId == "na"){
-     
-    const response = (await db.create(pollId, data)).toString()
-    const x = await services.addAssosiatedLessons(data.lesson, "polls",response.toString(), data.title);
-    res.send( response);
+  if(await services.isUserAdminOrTeacher(req.user.emails[0].value)){
+    const data = req.body;
+    const pollId = req.params.id;
+    delete data["_id"]
+    let currentPollId = 0;
+    if(!data.answers){
+      data.answers = []
+    }
+    //Remove any answers not attributed to a user
+    let cleanAnswers = data.answers.filter(answer => answer.user !== '')
+    data.answers = cleanAnswers? cleanAnswers : []
+
+    if(pollId == "NaN" || pollId == "0" || pollId == "na"){
+
+      const response = (await db.create(pollId, data)).toString()
+      const x = await services.addAssosiatedLessons(data.lesson, "polls",response.toString(), data.title);
+      res.send( response);
+
+    }else{
+      const update = await db.update(pollId, data);
+      const x = await services.addAssosiatedLessons(data.lesson, "polls", pollId, data.title);
+
+      res.send("ok")
+    }
     
-  }else{
-    const update = await db.update(pollId, data);
-    const x = await services.addAssosiatedLessons(data.lesson, "polls", pollId, data.title);
-    
-    res.send("ok")
+  } else {
+    res.sendStatus(403);
   }
   
     //res.send("ok");

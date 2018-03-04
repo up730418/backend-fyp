@@ -67,3 +67,11 @@ module.exports.addResult = async(id, data, user) => {
   return questionaireUpdate;  
 };
 
+module.exports.switchHidden = async(questionnaireId, value) => {
+  const questionnaireCollection = dbs.collection("questionnaire");
+  const update = questionnaireCollection.updateOne({questionnaireId: parseInt(questionnaireId)}, 
+                                          {$set: {hidden: value}},
+                                          { upsert: true });
+   return update;
+};
+
