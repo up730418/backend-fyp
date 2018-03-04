@@ -37,12 +37,6 @@ module.exports.getByTeachingClassById = async(classId) => {
   return data;  
 };
 
-module.exports.getByTeachingClassName = async(name) => {
-  const teachingClassCollection = dbs.collection("teachingClass");
-  let data = await teachingClassCollection.findOne({name: name});
-
-  return data;  
-};
 
 module.exports.createTeachingClass = async(name, students) => {
   

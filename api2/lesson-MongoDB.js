@@ -108,7 +108,7 @@ module.exports.updateRelatedItem = async(lessonId, type, itemId, itemTitle) => {
     item.title = itemTitle;
     
   } else {
-    data[type].push({"id" : itemId.toString(), "title": itemTitle.toString()});
+    data[type].push({"id" : itemId.toString(), "title": itemTitle.toString(), "hidden" : true });
   }
   
   let update = await lessonCollection.updateOne({"_id": data._id}, data);

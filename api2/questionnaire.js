@@ -110,6 +110,6 @@ questionnaire.put('/:id(\\w+)', bodyParser.json(), async (req, res) => {
   const questionnaireId = parseInt(req.params.id);
   let dat = await db.addResult(questionnaireId, data, req.user.emails[0].value);
   
-  res.send(200);
+  res.sendStatus(200);
   //res.send("ok")
 });
