@@ -223,7 +223,7 @@ module.exports.switchLessonQuestionnaire = async(lessonId, questionnaireId, visi
   
   let update = await lessonCollection.updateOne({"_id": data._id}, data);
   
-  return updated;
+  return update;
 }
 
 module.exports.delete = async(id) => {

@@ -62,7 +62,7 @@ module.exports.addResult = async(id, data, user) => {
   }
   //Update record
   let questionaireUpdate = await questionnaireCollection.updateOne({_id: questionnaireRecord["_id"] }, 
-                                          {$set: questionnaireRecord},
+                                          {$set: {"answers": questionnaireRecord.answers}},
                                           { upsert: true, });
   return questionaireUpdate;  
 };
