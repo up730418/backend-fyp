@@ -87,7 +87,6 @@ wss.on('connection', (ws) => {
   ws.on('close', () => {
     console.log('disconnected');
     ws.terminate();
-    console.log(ws);
   });
 });
 
