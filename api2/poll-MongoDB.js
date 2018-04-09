@@ -1,13 +1,8 @@
 const url = 'mongodb://localhost:27017/data';
 const MongoClient = require('mongodb').MongoClient;
 const assert = require('assert');
-let dbs;
-let db =  MongoClient.connect(url, (err, db) =>{
-  assert.equal(null, err, "unable to connect to Database");
-  dbs = db;
-  return db;
-});
-
+const mongoUtil = require( '../mongoUtil.js' );
+const dbs = mongoUtil.getDb();
 
 module.exports.get = async(id) => {
   
