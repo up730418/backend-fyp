@@ -33,7 +33,7 @@ questionnaire.get('/:id(\\w+)', async (req, res) => {
         res.sendStatus(403);
       }
     } catch (e) {
-      console.log(e);
+      console.error(e);
       res.sendStatus(500);
     }
   } else {
@@ -54,7 +54,7 @@ questionnaire.delete('/:id(\\w+)', async (req, res) => {
         res.sendStatus(403);
       }
     } catch (e) {
-      console.log(e);
+      console.error(e);
       res.sendStatus(500);
     }
   } else {

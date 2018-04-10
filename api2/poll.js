@@ -34,7 +34,7 @@ poll.get('/:id(\\w+)', async (req, res) => {
         res.sendStatus(403);
       }
     } catch (e) {
-      console.log(e);
+      console.error(e);
       res.sendStatus(500);
     }
   } else {
@@ -57,7 +57,7 @@ poll.delete('/:id(\\w+)', async (req, res) => {
         res.sendStatus(403);
       }
     } catch (e) {
-      console.log(e);
+      console.error(e);
       res.sendStatus(500);
     }
   } else {
@@ -118,7 +118,7 @@ poll.post('/:id(\\w+)', bodyParser.json(), async (req, res) => {
 /** * Poll Websockets **** */
 
 wss.on('connection', (ws) => {
-  console.log('Poll Web Socket Connected');
+//  console.log('Poll Web Socket Connected');
   // console.log(ws.upgradeReq.url);
 
 
@@ -128,14 +128,6 @@ wss.on('connection', (ws) => {
 
     switch (data.type) {
       case 'poll':
-        console.log('poll wss done');
-        // console.log(data);
-
-        // addPollResult(data)
-        // insertData("poll", {user: data.user, data: data.pollSelection,
-        //                    pollId: data.pollId, timeStamp: new Date()});
-
-        // wss.broadcast("1", data.pollId, data.vote);
         break;
     }
   });

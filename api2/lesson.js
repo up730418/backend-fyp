@@ -45,7 +45,7 @@ lesson.get('/:id(\\w+)', async (req, res) => {
         res.sendStatus(403);
       }
     } catch (e) {
-      console.log(e);
+      console.error(e);
       res.sendStatus(500);
     }
   } else {
@@ -135,7 +135,7 @@ lesson.delete('/:id(\\w+)', async (req, res) => {
         res.sendStatus(403);
       }
     } catch (e) {
-      console.log(e);
+      console.error(e);
       res.sendStatus(500);
     }
   } else {
@@ -147,7 +147,7 @@ lesson.delete('/:id(\\w+)', async (req, res) => {
 /** * Lessons Websockets **** */
 
 wss.on('connection', (ws) => {
-  console.log('Lesson Web Socket Connected');
+//  console.log('Lesson Web Socket Connected');
   // console.log(ws.upgradeReq.url);
 
 
@@ -157,12 +157,10 @@ wss.on('connection', (ws) => {
 
     switch (data.type) {
       case 'quizSwitch':
-        console.log('1');
         db.switchLessonQuestionnaire(data.lessonId, data.compId);
         break;
 
       case 'pollSwitch':
-        console.log('2');
         db.switchLessonPoll(data.lessonId, data.compId);
         break;
     }

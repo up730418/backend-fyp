@@ -21,8 +21,6 @@ module.exports.create = async (questionnaireId, data) => {
 };
 
 module.exports.update = async (questionnaireId, data) => {
-  console.log('update');
-  console.log(data);
   const questionnaireCollection = dbs.collection('questionnaire');
   data.questionnaireId = parseInt(questionnaireId);
   questionnaireCollection.updateOne(

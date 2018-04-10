@@ -1,5 +1,3 @@
-const url = 'mongodb://localhost:27017/data';
-const MongoClient = require('mongodb').MongoClient;
 const assert = require('assert');
 const mongoUtil = require('../mongoUtil.js');
 
@@ -44,13 +42,11 @@ module.exports.update = async (pollId, data) => {
 
 module.exports.switchHidden = async (pollId, value) => {
   const pollCollection = dbs.collection('poll');
-  console.log('switc1');
   const update = pollCollection.updateOne(
     { pollId: parseInt(pollId) },
     { $set: { hidden: value } },
     { upsert: true },
   );
-  console.log('switc2');
   return update;
 };
 
@@ -67,7 +63,6 @@ module.exports.delete = async (id) => {
 
 function updatePoll(doc, pollId, user, vote) {
   return new Promise((resolve) => {
-    console.log('1');
 
     const pollCollection = dbs.collection('poll');
     let userAlreadyAnswered = false;
@@ -81,7 +76,6 @@ function updatePoll(doc, pollId, user, vote) {
 
         pollCollection.updateOne({ pollId }, doc, (err, res) => {
           assert.equal(null, err, 'unable to update poll');
-          console.log('old answer updated');
         });
         userAlreadyAnswered = oldVote;
       }
@@ -91,7 +85,6 @@ function updatePoll(doc, pollId, user, vote) {
       doc.answers.push({ user, answer: vote });
       pollCollection.updateOne({ pollId }, doc, (err, res) => {
         assert.equal(null, err, 'unable to update poll');
-        console.log('new answer added');
       });
     }
     resolve(userAlreadyAnswered);

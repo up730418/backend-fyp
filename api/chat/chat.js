@@ -94,8 +94,7 @@ function sendMessage() {
         type: 'chat',
       }), (e) => {
         alert('hi');
-        console.log('sfafjkjhkan');
-        console.log(error);
+        console.error(error);
       });
       test.value = '';
     } catch (e) {

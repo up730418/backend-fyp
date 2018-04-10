@@ -104,7 +104,6 @@ module.exports.updateRelatedItem = async (lessonId, type, itemId, itemTitle) => 
 };
 
 module.exports.deleteRelatedItem = async (lessonId, type, itemId) => {
-  console.log('deleting');
   const lessonCollection = dbs.collection('lesson');
   const data = await lessonCollection.findOne({ lessonId: parseInt(lessonId) });
 
@@ -163,7 +162,6 @@ module.exports.switchPoll = async (lessonId, pollIds, visibility) => {
   pollIds.forEach((pollId) => {
     item = data.polls.find(item => item.id == pollId.toString());
     item.hidden = visibility;
-    console.log(item);
   });
   const update = await lessonCollection.updateOne({ _id: data._id }, data);
   return update;
@@ -175,7 +173,6 @@ module.exports.switchQuestionnaire = async (lessonId, questionnaireIds, visibili
   questionnaireIds.forEach((questionnaireId) => {
     item = data.questionairs.find(item => item.id == questionnaireId.toString());
     item.hidden = visibility;
-    console.log(item);
   });
 
   const update = await lessonCollection.updateOne({ _id: data._id }, data);

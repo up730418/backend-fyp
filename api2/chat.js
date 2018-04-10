@@ -25,7 +25,7 @@ chat.get('/:id', async (req, res) => {
     //    console.log(req.user)
     res.json(await db.get(room, 50));
   } catch (e) {
-    console.log(e);
+    console.error(e);
     res.sendStatus(500);
   }
 });
@@ -61,14 +61,12 @@ chat.put('/:id', bodyParser.text(), async (req, res) => {
   try {
     res.json(await db.put(data, user, room));
   } catch (e) {
-    console.log(e);
+    console.error(e);
     res.sendStatus(500);
   }
 });
 
 wss.on('connection', (ws) => {
-  console.log('Chat Web Socket Connected');
-
   ws.on('message', (data) => {
     var data = JSON.parse(data);
     const message = data.message;
