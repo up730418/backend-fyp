@@ -25,7 +25,7 @@ poll.get('/:id(\\w+)', async (req, res) => {
   if (id) {
     try {
       const data = await db.get(id);
-      const lessons = await services.getAssosiatedLessons(id, 'poll');
+      const lessons = await services.getAssosiatedLessons(id, 'polls');
       data.lesson = lessons;
       const access = await services.isUserAllowedAccess(req.user.emails[0].value, data);
       if (access) {
@@ -52,7 +52,6 @@ poll.delete('/:id(\\w+)', async (req, res) => {
       if (access) {
         const deleteStatus = await db.delete(id);
         const removeFromAssosiatedLessons = await services.removeAssosiatedLessons(id, 'polls');
-        console.log(deleteStatus);
         res.sendStatus(202);
       } else {
         res.sendStatus(403);

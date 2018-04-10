@@ -2,7 +2,6 @@ const lessondb = require('./lesson-MongoDB');
 const userdb = require('./user-MongoDB');
 const teachingClassdb = require('./teachingClass-MongoDB');
 const polldb = require('./poll-MongoDB');
-const questionnairedb = require('./questionnaire-MongoDB');
 
 /** *********** Lesson Functions ****** */
 
@@ -14,10 +13,19 @@ module.exports.getAssosiatedLessons = async (id, type) => {
   return lessonsArray;
 };
 
+// function gal(id, type) {
+//  const lessons = await lessondb.getRelatedData(id, type);
+//  let lessonsArray = [];
+//  lessons.forEach(lesson => lessonsArray.push(lesson.lessonId));
+//  return lessonsArray;
+// }
+
 // Remove  a poll/quiz from a lesson
 module.exports.removeAssosiatedLessons = async (id, type) => {
-  const lessons = await getAssosiatedLessons(id);
-  lessons.forEach(lesson => lessondb.deleteRelatedItem(lesson, type, id));
+  const lessons = await lessondb.getRelatedData(id, type);
+  const lessonsArray = [];
+  lessons.forEach(lesson => lessonsArray.push(lesson.lessonId));
+  lessonsArray.forEach(lesson => lessondb.deleteRelatedItem(lesson, type, id));
 };
 
 // Add a poll/quiz to a lesson

@@ -1,5 +1,4 @@
 const bodyParser = require('body-parser');
-const assert = require('assert');
 const express = require('express');
 
 const teachingClass = express.Router();
@@ -43,7 +42,7 @@ teachingClass.put('/', bodyParser.json(), async (req, res) => {
 });
 
 teachingClass.delete('/:classId', async (req, res) => {
-  const classID = req.params.classId;
+  const classId = req.params.classId;
   if (await services.isUserAdmin(req.user.emails[0].value)) {
     res.send(await db.deleteTeachingClass(classId));
   } else {

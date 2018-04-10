@@ -1,6 +1,3 @@
-const url = 'mongodb://localhost:27017/data';
-const MongoClient = require('mongodb').MongoClient;
-const assert = require('assert');
 const mongoUtil = require('../mongoUtil.js');
 
 const dbs = mongoUtil.getDb();
@@ -14,7 +11,10 @@ module.exports.getTeachingClass = async () => {
 
 module.exports.getUsersTeachingClasses = async (userName) => {
   const teachingClassCollection = dbs.collection('teachingClass');
-  const data = await teachingClassCollection.find({ students: { $in: [userName] } }, { name: 1, _id: 0 });
+  const data = await teachingClassCollection.find(
+    { students: { $in: [userName] } },
+    { name: 1, _id: 0 },
+  );
 
   return data ? data.toArray() : [];
 };
@@ -38,7 +38,7 @@ module.exports.createTeachingClass = async (name, students) => {
   const teachingClassCollection = dbs.collection('teachingClass');
   const lastRec = await teachingClassCollection.findOne({}, { sort: { classId: -1 } });
 
-  classId = lastRec ? lastRec.classId + 1 : 1;
+  const classId = lastRec ? lastRec.classId + 1 : 1;
 
   const data = await teachingClassCollection.insert({
     classId,

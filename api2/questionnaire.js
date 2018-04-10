@@ -43,11 +43,12 @@ questionnaire.get('/:id(\\w+)', async (req, res) => {
 
 questionnaire.delete('/:id(\\w+)', async (req, res) => {
   const id = parseInt(req.params.id);
+  const data = await db.get(id);
   if (id) {
     try {
       if (await services.isUserOwnerOrAdmin(req.user.emails[0].value, data)) {
         const deleteStatus = await db.delete(id);
-        const removeFromAssosiatedLessons = await services.removeAssosiatedLessons(id, 'questionnaire');
+        const removeFromAssosiatedLessons = await services.removeAssosiatedLessons(id, 'questionairs');
         res.sendStatus(202);
       } else {
         res.sendStatus(403);

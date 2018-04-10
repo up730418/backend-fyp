@@ -1,5 +1,3 @@
-const url = 'mongodb://localhost:27017/data';
-const MongoClient = require('mongodb').MongoClient;
 const assert = require('assert');
 const mongoUtil = require('../mongoUtil.js');
 
@@ -72,7 +70,7 @@ module.exports.getRelatedData = async (id, type) => {
   let data;
 
   switch (type) {
-    case 'poll':
+    case 'polls':
       data = await lessonCollection.find({ polls: { $elemMatch: { id: id.toString() } } }, { lessonId: 1, _id: 0 });
       break;
 

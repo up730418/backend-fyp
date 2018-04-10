@@ -1,5 +1,4 @@
 const bodyParser = require('body-parser');
-const assert = require('assert');
 const express = require('express');
 
 const user = express.Router();
@@ -44,7 +43,6 @@ user.post('/', bodyParser.json(), async (req, res) => {
 
 user.put('/', bodyParser.json(), async (req, res) => {
   const data = req.body;
-  const admin = await services.isUserAdmin(req.user.emails[0].value);
   if (await services.isUserAdmin(req.user.emails[0].value)) {
     res.send(await db.updateUser(data.userName, data.firstName, data.lastName, data.userType));
   } else {
