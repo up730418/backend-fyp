@@ -48,7 +48,7 @@ module.exports.userRole = async (userName) => {
 // Find out if a user is  admin
 module.exports.isUserAdmin = async (userName) => {
   const user = await userdb.getByUserName(userName);
-  return user.userType === 'Admin';
+  return user? user.userType === 'Admin' : false;
 };
 // Find out if a user is  admin or teacher
 module.exports.isUserAdminOrTeacher = async (userName) => {
